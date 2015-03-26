@@ -8,8 +8,10 @@ namespace skylinesrotatebrush
 {
     public class RotateBrushLoader : LoadingExtensionBase
     {
-        SavedInputKey rotateRight;
-        SavedInputKey rotateLeft;
+        SavedInputKey keyRotateRight;
+        SavedInputKey keyRotateLeft;
+
+        RotateBrush rotateBrush;
 
         public override void OnLevelLoaded (LoadMode mode)
         {
@@ -17,20 +19,21 @@ namespace skylinesrotatebrush
                 return;
             }
 
-            rotateRight = new SavedInputKey (Settings.cameraRotateRight, Settings.gameSettingsFile, DefaultSettings.cameraRotateRight, false);
-            rotateLeft = new SavedInputKey (Settings.cameraRotateLeft, Settings.gameSettingsFile, DefaultSettings.cameraRotateLeft, false);
+            keyRotateRight = new SavedInputKey (Settings.cameraRotateRight, Settings.gameSettingsFile, DefaultSettings.cameraRotateRight, false);
+            keyRotateLeft = new SavedInputKey (Settings.cameraRotateLeft, Settings.gameSettingsFile, DefaultSettings.cameraRotateLeft, false);
 
             UIInput.eventProcessKeyEvent += handleRotation;
+            rotateBrush = new RotateBrush();
         }
 
         void handleRotation (UnityEngine.EventType eventType, UnityEngine.KeyCode keyCode, UnityEngine.EventModifiers modifiers)
         {
             if (eventType == EventType.KeyDown && modifiers == EventModifiers.Control) {
-                if (keyCode == rotateLeft.Key) {
-                    RotateBrush.rotateLeft ();
+                if (keyCode == keyRotateLeft.Key) {
+                    rotateBrush.rotateLeft();
                 }
-                if (keyCode == rotateRight.Key) {
-                    RotateBrush.rotateRight ();
+                if (keyCode == keyRotateRight.Key) {
+                    rotateBrush.rotateRight();
                 }
             }
         }
@@ -38,6 +41,7 @@ namespace skylinesrotatebrush
         public override void OnLevelUnloading ()
         {
             UIInput.eventProcessKeyEvent -= handleRotation;
+            rotateBrush = null;
             base.OnLevelUnloading ();
         }
     }
