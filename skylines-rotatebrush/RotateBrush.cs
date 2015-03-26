@@ -12,7 +12,7 @@ namespace skylinesrotatebrush
 
         public RotateBrush ()
         {
-            originalBrush = new Texture2D(0,0);
+            originalBrush = new Texture2D (0, 0);
         }
         
         public void rotateLeft ()
@@ -33,7 +33,7 @@ namespace skylinesrotatebrush
                     return;
                 }
 
-                if (!originalBrush.name.Equals(currentBrush.name)) {
+                if (!originalBrush.name.Equals (currentBrush.name)) {
                     // brush has changed
                     dstAngle = 0;
                     originalBrush = currentBrush;
@@ -44,7 +44,7 @@ namespace skylinesrotatebrush
                 Texture2D nextBrush = rotateTexture (originalBrush, dstAngle);
                 setBrush (nextBrush);
             } catch (Exception ex) {
-                DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Error,"RotateBrush Exception: "+ex.ToString());
+                DebugOutputPanel.AddMessage (ColossalFramework.Plugins.PluginManager.MessageType.Error, "RotateBrush Exception: " + ex.ToString ());
             }
         }
 
@@ -91,16 +91,20 @@ namespace skylinesrotatebrush
 
         private Texture2D rotateTexture (Texture2D src, int angle)
         {
-            Texture2D dst = new Texture2D (src.width, src.height);
+            float sizeScale = Mathf.Sqrt (2f);
+            Texture2D dst = new Texture2D (Mathf.RoundToInt (src.width * sizeScale), Mathf.RoundToInt (src.height * sizeScale));
             
             src.wrapMode = TextureWrapMode.Clamp;
 
-            Vector3 pivot = new Vector3 (dst.width / 2 - 0.5f, dst.height / 2 - 0.5f, 0);
+            Vector3 adjustForScalingPivot = new Vector3 ((src.width * sizeScale - src.width) / 2, (src.height * sizeScale - src.height) / 2, 0);
+
+            Vector3 pivot = new Vector3 (src.width / 2 - 0.5f, src.height / 2 - 0.5f, 0);
             Vector3 scale = Vector3.one;
             Quaternion rotation = Quaternion.Euler (0, 0, angle);
-            
+
+            Matrix4x4 adjustForScaling = Matrix4x4.TRS (-1f * adjustForScalingPivot, Quaternion.identity, scale);
             Matrix4x4 translateToPivot = Matrix4x4.TRS (-1f * pivot, Quaternion.identity, scale);
-            Matrix4x4 rotate = Matrix4x4.TRS (Vector3.zero, rotation, Vector3.one);
+            Matrix4x4 rotate = Matrix4x4.TRS (Vector3.zero, rotation, scale);
             Matrix4x4 translateBack = Matrix4x4.TRS (pivot, Quaternion.identity, scale);
 
             Vector3 srcCoords;
@@ -108,6 +112,7 @@ namespace skylinesrotatebrush
                 for (int y = 0; y < dst.height; y++) {                    
                     srcCoords = new Vector3 (x, y, 0);
 
+                    srcCoords = adjustForScaling.MultiplyPoint3x4 (srcCoords);
                     srcCoords = translateToPivot.MultiplyPoint3x4 (srcCoords);
                     srcCoords = rotate.MultiplyPoint3x4 (srcCoords);
                     srcCoords = translateBack.MultiplyPoint3x4 (srcCoords);
