@@ -12,7 +12,7 @@ namespace skylinesrotatebrush
 
         public RotateBrush ()
         {
-            originalBrush = new Texture2D(0,0);
+            originalBrush = new Texture2D (0, 0);
         }
         
         public void rotateLeft ()
@@ -33,7 +33,7 @@ namespace skylinesrotatebrush
                     return;
                 }
 
-                if (!originalBrush.name.Equals(currentBrush.name)) {
+                if (!originalBrush.name.Equals (currentBrush.name)) {
                     // brush has changed
                     dstAngle = 0;
                     originalBrush = currentBrush;
@@ -44,7 +44,7 @@ namespace skylinesrotatebrush
                 Texture2D nextBrush = rotateTexture (originalBrush, dstAngle);
                 setBrush (nextBrush);
             } catch (Exception ex) {
-                DebugOutputPanel.AddMessage(ColossalFramework.Plugins.PluginManager.MessageType.Error,"RotateBrush Exception: "+ex.ToString());
+                DebugOutputPanel.AddMessage (ColossalFramework.Plugins.PluginManager.MessageType.Error, "RotateBrush Exception: " + ex.ToString ());
             }
         }
 
@@ -134,7 +134,7 @@ namespace skylinesrotatebrush
             
             int xN = Mathf.RoundToInt ((sourceCoords.x - xPos) * N);
             int yN = Mathf.RoundToInt ((sourceCoords.y - yPos) * N);
-            
+
             Color avg = ((N - xN) * (N - yN) * f1 + xN * (N - yN) * f2 + yN * (N - xN) * f3 + xN * yN * f4) / (N * N);
             
             return avg;
